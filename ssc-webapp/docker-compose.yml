@@ -1,0 +1,11 @@
+services:
+  ssc-webapp:
+    container_name: ssc-webapp
+    image: fortifydocker/ssc-webapp:24.4.2.0009
+    restart: always
+    env_file: .env
+    volumes:
+      - './secrets:/app/secrets:z'
+      - './data:/fortify:z'
+    ports:
+      - '7443:8443'

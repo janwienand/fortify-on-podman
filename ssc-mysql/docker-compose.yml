@@ -1,0 +1,16 @@
+services:
+  db:
+    container_name: ssc-mysql
+    image: mysql:8.0.38
+    restart: always
+
+    volumes:
+      - ./data:/var/lib/mysql
+      - ./secrets/config-file.cnf:/etc/mysql/conf.d/config-file.cnf:z
+    ports:
+      - 3306:3306
+    env_file: .env
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "3"

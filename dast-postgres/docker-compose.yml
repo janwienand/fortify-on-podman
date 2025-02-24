@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  postgresql:
+    image: docker.io/bitnami/postgresql:15
+    ports:
+      - '5432:5432'
+    volumes:
+      - './data:/bitnami/postgresql:z'
+    env_file: .env

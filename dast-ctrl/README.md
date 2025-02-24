@@ -1,7 +1,7 @@
 # ScanCentral DAST Controller
 ## ❓ Description
 
-This repo contains the files required for a Podman Fortify ScanCentral DAST deployment.
+This repo contains the files required for a Podman Fortify ScanCentral DAST Controller deployment.
 
 ## 🎉 Deployment
 

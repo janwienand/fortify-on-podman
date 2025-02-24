@@ -100,4 +100,5 @@ loading in the destination environment:
     ```sh
     https://<DAST_API_HOST>:<DAST_API_PORT>/api/
     ```
+
 **_NOTE:_** Please make sure to include "/" at the end of the URL.

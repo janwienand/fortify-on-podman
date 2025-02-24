@@ -95,8 +95,6 @@ loading in the destination environment:
       https://<DAST_API_HOST>:<DAST_API_PORT>/swagger/index.html
       ```
 
-      [![Screenshot-2025-02-24-at-09-53-17.png](https://i.postimg.cc/CdyTW08D/Screenshot-2025-02-24-at-09-53-17.png)](https://postimg.cc/jnhF7GZd)
-
 11. Open up the Software Security Center, enable ScanCentral DAST (under Administration - ScanCentral DAST) and insert the ScanCentral DAST server URL (from you .env file).
 
     ```sh

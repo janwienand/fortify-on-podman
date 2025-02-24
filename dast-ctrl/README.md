@@ -102,3 +102,7 @@ loading in the destination environment:
     ```
 
     **_NOTE:_** Please make sure to include "/" at the end of the URL.
+
+    [![Screen-Shot-2025-02-24-at-09-43-47-AM.png](https://i.postimg.cc/L83K0r8Y/Screen-Shot-2025-02-24-at-09-43-47-AM.png)](https://postimg.cc/w1MG14Jg)
+
+12. Please restart the Software Security Center.

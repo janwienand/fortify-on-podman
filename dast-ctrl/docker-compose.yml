@@ -1,0 +1,98 @@
+version: '3.9'
+
+services:
+  upgrade_job:
+    image: ${DOCKER_IMAGE_UPGRADE_JOB}
+    volumes:
+      - './secrets:/app/secrets:z'
+      - './output:/output:z'
+    env_file: .env
+    command:
+      - configureEnvironment
+      - --mode
+      - AutoDeploy
+      - --settingsFile
+      - /app/secrets/SettingsFile.yaml
+      - --outputDirectory
+      - /output
+
+  datastore:
+    depends_on:
+      upgrade_job:
+        condition: service_completed_successfully
+    image: ${DOCKER_IMAGE_DATASTORE}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - "ACCEPT_EULA=Y"
+      - "MSSQL_PID=Express"
+      - "SA_PASSWORD=${DAST_DB_MSSQL_SA_PASSWORD}"
+    networks:
+      - wi_net
+    volumes:
+      - scandata:/etc/wi/.widata/user/ScanData:z
+    logging:
+      driver: none
+
+  scanner:
+    image: ${DOCKER_IMAGE_SCANNER}
+    pull_policy: never
+    restart: unless-stopped
+    ports:
+      - ${DAST_UTILITYSERVICE_PORT}:5001
+    depends_on:
+      - datastore
+    networks:
+      - wi_net
+    volumes:
+      - scandata:/etc/wi/.widata/user/ScanData:z
+      - ./secrets:/app/secrets:z
+    env_file: .env
+    environment:
+      - "WI_MODE=4"
+      - "WI_API_HOST=127.0.0.1"
+      - "WI_API_PORT=8089"
+      - "WI_API_AUTH=None"
+      - "WI_WISE="
+      - "FORTIFY_2FA_REMOTE_ADDR="
+      - "FORTIFY_2FA_MASTER_TOKEN="
+      - "WI_SQLEXPRESS=Data Source=datastore;User Id=sa;Password=${DAST_DB_MSSQL_SA_PASSWORD};"
+      - "LIM="
+      - "LIM_POOL_NAME="
+      - "LIM_POOL_PSWD="
+      - "ConnectionStrings__DASTDB=Server=${DAST_DB_SERVER};Database=${DAST_DB_DATABASE};User Id=${DAST_DB_STD_USER};Password=${DAST_DB_STD_PASSWORD};"
+      - "DBProvider=${DAST_DB_TYPE}"
+
+  scancentral-dast-api:
+    image: ${DOCKER_IMAGE_DAST_API}
+    pull_policy: always
+    depends_on:
+      upgrade_job:
+        condition: service_completed_successfully
+    ports:
+      - ${DAST_API_PORT}:${DAST_API_CONTAINER_PORT}
+    volumes:
+      - ./secrets:/app/secrets:z
+    restart: always
+    networks:
+      - wi_net
+    env_file: .env
+    environment:
+      - "ConnectionStrings__DASTDB=Server=${DAST_DB_SERVER};Database=${DAST_DB_DATABASE};User Id=${DAST_DB_STD_USER};Password=${DAST_DB_STD_USER};"
+      - "DBProvider=${DAST_DB_TYPE}"
+  scancentral-dast-globalservice:
+    image: ${DOCKER_IMAGE_DAST_GLOBALSERVICE}
+    pull_policy: always
+    depends_on:
+      - scancentral-dast-api
+    restart: always
+    env_file: .env
+    networks:
+      - wi_net
+    environment:
+      - "ConnectionStrings__DASTDB=Server=${DAST_DB_SERVER};Database=${DAST_DB_DATABASE};User Id=${DAST_DB_STD_USER};Password=${DAST_DB_STD_USER};"
+      - "DBProvider=${DAST_DB_TYPE}"
+networks:
+  wi_net:
+volumes:
+  scandata:

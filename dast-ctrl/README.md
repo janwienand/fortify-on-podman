@@ -32,7 +32,6 @@ loading in the destination environment:
     ```
 
     **_NOTE:_**  This step is not required if you have direct connection to Docker Hub
-   ```
 
 ### 🐳 Deployment
 

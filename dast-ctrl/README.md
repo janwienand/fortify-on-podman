@@ -95,4 +95,9 @@ loading in the destination environment:
       https://<DAST_API_HOST>:<DAST_API_PORT>/swagger/index.html
       ```
 
-11. You can then go to SSC, enable ScanCentral SAST using the ShareSecret defined in the .env file (SCANCENTRAL_CONFIG_SSC_SCANCENTRAL_CTRL_SECRET)
+11. Open up the Software Security Center, enable ScanCentral DAST (under Administration - ScanCentral DAST) and insert the ScanCentral DAST server URL (from you .env file).
+
+    ```sh
+    https://<DAST_API_HOST>:<DAST_API_PORT>/api/
+    ```
+**_NOTE:_** Please make sure to include "/" at the end of the URL.

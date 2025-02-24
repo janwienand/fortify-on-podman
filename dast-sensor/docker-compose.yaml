@@ -1,0 +1,70 @@
+version: "3"
+services:
+    datastore:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        restart: unless-stopped
+        environment:
+          - "ACCEPT_EULA=Y"
+          - "MSSQL_PID=Express"
+          - "SA_PASSWORD=${DB_MSSQL_SA_PASSWORD}"
+        networks:
+          - wi_net
+        volumes:
+          - scandata:/etc/wi/.widata/user/ScanData:z
+        logging:
+          driver: none
+
+    wise:
+        image: fortifydocker/wise:24.4.ubi.9
+        pull_policy: always
+        restart: unless-stopped
+        networks:
+          - wi_net
+
+    twofa:
+        image: fortifydocker/fortify-2fa:24.4.ubi.9
+        pull_policy: always
+        restart: unless-stopped
+        ports:
+          - 5443:5443
+        networks:
+          - wi_net
+        environment:
+          - "FORTIFY_2FA_MASTER_TOKEN=70327788-f28a-4402-b7b8-0a7a5bfa5ce6"
+
+    scanner:
+        image: fortifydocker/dast-scanner:24.4.ubi.9
+        pull_policy: never
+        restart: unless-stopped
+        depends_on:
+          - datastore
+        networks:
+          - wi_net
+        volumes:
+          - scandata:/etc/wi/.widata/user/ScanData:z
+        environment:
+          - "WI_MODE=3"
+          - "WI_API_HOST=127.0.0.1"
+          - "WI_API_PORT=8089"
+          - "WI_API_AUTH=None"
+          - "WI_WISE=ws://wise:9442"
+          - "FORTIFY_2FA_REMOTE_ADDR=twofa"
+          - "FORTIFY_2FA_MASTER_TOKEN=70327788-f28a-4402-b7b8-0a7a5bfa5ce6"
+          - "WI_SQLEXPRESS=Data Source=datastore;User Id=sa;Password=${DB_MSSQL_SA_PASSWORD};"
+          - "LIM="
+          - "LIM_POOL_NAME="
+          - "LIM_POOL_PSWD="
+          - "DASTApiRootUrl=https://${FTFY_SCDAST_HOST}:64814"
+          - "AllowNonTrustedServerCertificate=true"
+          - "ServiceToken=${FTFY_SCDAST_SERVICE_TOKEN}"
+          - "ScannerPoolId=0"
+          - "ScannerDescription="
+          - "ScannerType=Fixed"
+#        deploy:
+#          resources:
+#            limits:
+#              cpus: '0.1'
+networks:
+  wi_net:
+volumes:
+  scandata:

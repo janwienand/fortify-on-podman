@@ -31,6 +31,7 @@ services:
           - wi_net
         environment:
           - "FORTIFY_2FA_MASTER_TOKEN=70327788-f28a-4402-b7b8-0a7a5bfa5ce6"
+          - "FORTIFY_2FA_API_PORT=5443"
 
     scanner:
         image: fortifydocker/dast-scanner:24.4.ubi.9
